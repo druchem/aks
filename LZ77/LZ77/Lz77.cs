@@ -3,15 +3,6 @@ using System.Collections.Generic;
 
 namespace LZ77
 {
-	internal struct Triplet
-	{
-		public ushort MatchOffset { get; set; }
-		public byte MatchLength { get; set; }
-		public byte NonMatchedByte { get; set; }
-
-		public override string ToString() => $"({MatchOffset}, {MatchLength}, {NonMatchedByte})";
-	}
-
 	internal class Lz77
 	{
 		private readonly int _windowSize;
