@@ -5,8 +5,8 @@ namespace LZ77
 {
 	internal struct Triplet
 	{
-		public int MatchOffset { get; set; }
-		public int MatchLength { get; set; }
+		public ushort MatchOffset { get; set; }
+		public byte MatchLength { get; set; }
 		public byte NonMatchedByte { get; set; }
 
 		public override string ToString() => $"({MatchOffset}, {MatchLength}, {NonMatchedByte})";
@@ -33,9 +33,10 @@ namespace LZ77
 			int lookAheadIndex = 0;
 			int searchOffset = 0;
 
-			while (lookAheadIndex + _maxMatchSize < buffer.Length)
+			while (lookAheadIndex < buffer.Length)
 			{
-				var lookAheadBuffer = buffer.Slice(lookAheadIndex, _maxMatchSize);
+				int lookAheadBufferSize = buffer.Length - lookAheadIndex > _maxMatchSize ? _maxMatchSize : buffer.Length - lookAheadIndex;
+				var lookAheadBuffer = buffer.Slice(lookAheadIndex, lookAheadBufferSize);
 
 				int searchBufferSize = lookAheadIndex < _maxSearchBufferSize ? lookAheadIndex : _maxSearchBufferSize;
 				var searchBuffer = buffer.Slice(searchOffset, searchBufferSize);
@@ -61,7 +62,7 @@ namespace LZ77
 				NonMatchedByte = lookAheadBuffer[0]
 			};
 
-			for (int matchLength = 1; matchLength < lookAheadBuffer.Length; matchLength++)
+			for (byte matchLength = 1; matchLength < lookAheadBuffer.Length; matchLength++)
 			{
 				var searchPattern = lookAheadBuffer.Slice(0, matchLength);
 
@@ -72,8 +73,8 @@ namespace LZ77
 				triplet = new Triplet
 				{
 					MatchLength = matchLength,
-					MatchOffset = searchBuffer.Length - matchIndex,
-					NonMatchedByte = lookAheadBuffer[matchLength] // can crash
+					MatchOffset = (ushort)(searchBuffer.Length - matchIndex),
+					NonMatchedByte = lookAheadBuffer[matchLength]
 				};
 			}
 

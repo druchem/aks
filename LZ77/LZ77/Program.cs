@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 
 namespace LZ77
 {
@@ -22,9 +21,10 @@ namespace LZ77
 					var lz = new Lz77(parameter.WindowSize, parameter.MaxMatch);
 					var triplets = lz.Encode(input);
 
-					int length = triplets.Sum(triplet => triplet.MatchLength);
+					int encSize = (int)(Math.Log(parameter.WindowSize, 2) + Math.Log(parameter.MaxMatch, 2) + 8) * triplets.Count;
+					float bps = 1f * encSize / input.Length;
 
-					Console.WriteLine($"{file}\t{triplets.Count}\t\t{input.Length}\t\t{parameter.WindowSize}\t\t{parameter.MaxMatch}\t\t{length}\t\t?????");
+					Console.WriteLine($"{file}\t{triplets.Count}\t\t{input.Length}\t\t{parameter.WindowSize}\t\t{parameter.MaxMatch}\t\t{encSize}\t\t{bps:F3}");
 				}
 			}
 
